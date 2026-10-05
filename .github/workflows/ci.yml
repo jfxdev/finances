@@ -1,0 +1,58 @@
+name: Validate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: finances
+          POSTGRES_PASSWORD: test-only-password
+          POSTGRES_DB: finances_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U finances -d finances_test"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      TEST_DATABASE_URL: postgres://finances:test-only-password@localhost:5432/finances_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check database migrations
+        run: |
+          pnpm db:check
+          pnpm db:generate
+          test -z "$(git status --porcelain -- apps/api/migrations)"
+      - run: pnpm generate:client && git diff --exit-code -- packages/contracts/openapi.json apps/web/src/lib/api.generated.ts
+      - run: pnpm typecheck && pnpm test && pnpm test:integration && pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Browser workflows
+        env:
+          DATABASE_URL: postgres://finances:test-only-password@localhost:5432/finances_test
+          SETUP_TOKEN: ci-only-setup-token-for-finances
+          MASTER_KEYS: '{"v1":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}'
+          PUBLIC_URL: http://localhost:3000
+          NODE_ENV: test
+          E2E_SETUP_TOKEN: ci-only-setup-token-for-finances
+        run: |
+          pnpm --filter @finances/api start > /tmp/finances-api.log 2>&1 &
+          for attempt in $(seq 1 30); do curl --fail http://localhost:3000/health/ready && break || sleep 1; done
+          pnpm test:e2e
+          MCP_TEST_URL=http://localhost:3000 pnpm --filter @finances/mcp smoke
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-traces
+          path: test-results/
+      - run: docker build -t finances:ci .

@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: finances
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD}
+      POSTGRES_DB: finances
+    volumes:
+      - finances_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U finances -d finances']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  migrate:
+    profiles: [maintenance]
+    build: .
+    image: finances:local
+    command: [node, dist/migrate.js]
+    environment:
+      DATABASE_URL: postgres://finances:${POSTGRES_PASSWORD}@db:5432/finances
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
+  app:
+    build: .
+    image: finances:local
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://finances:${POSTGRES_PASSWORD}@db:5432/finances
+      MASTER_KEYS: ${MASTER_KEYS:?Configure MASTER_KEYS}
+      ACTIVE_MASTER_KEY: ${ACTIVE_MASTER_KEY:-v1}
+      SETUP_TOKEN: ${SETUP_TOKEN:?Configure SETUP_TOKEN}
+      PUBLIC_URL: ${PUBLIC_URL:?Configure PUBLIC_URL}
+      NODE_ENV: ${NODE_ENV:-production}
+    ports:
+      - '127.0.0.1:${APP_PORT:-3000}:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://127.0.0.1:3000/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+volumes:
+  finances_db:

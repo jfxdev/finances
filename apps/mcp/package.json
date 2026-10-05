@@ -1,0 +1,22 @@
+{
+  "name": "@finances/mcp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "finances-mcp": "dist/main.js"
+  },
+  "scripts": {
+    "build": "tsup src/main.ts --format esm --out-dir dist",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/main.js",
+    "smoke": "node --import tsx src/smoke.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0"
+  }
+}

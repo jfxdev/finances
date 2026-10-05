@@ -1,0 +1,11 @@
+pnpm-lock.yaml
+packages/contracts/openapi.json
+apps/web/src/lib/api.generated.ts
+# Generated migration snapshots and SQL are immutable once applied.
+apps/api/migrations/
+node_modules
+.pnpm-store
+dist
+.local
+test-results
+playwright-report
