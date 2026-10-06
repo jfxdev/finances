@@ -1,5 +1,6 @@
 // Run only against an explicitly designated, disposable installation.
 import { randomUUID } from 'node:crypto';
+import { setTimeout } from 'node:timers/promises';
 import { UnauthorizedError } from '@modelcontextprotocol/sdk/client/auth.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import {
@@ -16,11 +17,23 @@ async function api(
   body?: unknown,
   headers: Record<string, string> = {},
 ) {
-  const r = await fetch(`${url}/api/v1${path}`, {
-    method,
-    headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...headers },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
+  const request = () =>
+    fetch(`${url}/api/v1${path}`, {
+      method,
+      headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...headers },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+  let r = await request();
+  // Browser workflows share this IP and may exhaust an authentication route's quota.
+  if (r.status === 429) {
+    const retryAfter = Number(r.headers.get('retry-after'));
+    if (Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 60) {
+      await r.body?.cancel();
+      process.stdout.write(`HTTP 429 em ${path}; nova tentativa em ${retryAfter + 1}s.\n`);
+      await setTimeout((retryAfter + 1) * 1000);
+      r = await request();
+    }
+  }
   if (!r.ok) throw new Error(`HTTP ${r.status} em ${path}`);
   return { response: r, json: await r.json() };
 }
