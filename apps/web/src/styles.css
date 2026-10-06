@@ -1,0 +1,148 @@
+@import 'tailwindcss';
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+:root {
+  --radius: 0.75rem;
+  --background: #f6f8f7;
+  --foreground: #142a22;
+  --card: #fff;
+  --card-foreground: #142a22;
+  --popover: #fff;
+  --popover-foreground: #142a22;
+  --primary: #17694e;
+  --primary-foreground: #fff;
+  --secondary: #e8efeb;
+  --secondary-foreground: #203c30;
+  --muted: #eef2f0;
+  --muted-foreground: #62756b;
+  --accent: #e8efeb;
+  --accent-foreground: #142a22;
+  --destructive: #bd3342;
+  --border: #dce5df;
+  --input: #d5e0d9;
+  --ring: #228361;
+  --chart-1: #228361;
+  --chart-2: #6bb6a0;
+  --chart-3: #efae54;
+  --chart-4: #758bc2;
+  --chart-5: #c58698;
+  --sidebar: #142a22;
+  --sidebar-foreground: #d6e5dd;
+  --sidebar-primary: #b5e6c7;
+  --sidebar-primary-foreground: #142a22;
+  --sidebar-accent: #254436;
+  --sidebar-accent-foreground: #fff;
+  --sidebar-border: #345143;
+  --sidebar-ring: #6bb6a0;
+}
+.dark {
+  --background: #101c17;
+  --foreground: #e2eee7;
+  --card: #182a21;
+  --card-foreground: #e2eee7;
+  --popover: #182a21;
+  --popover-foreground: #e2eee7;
+  --primary: #81cfa3;
+  --primary-foreground: #102a1e;
+  --secondary: #243a2e;
+  --secondary-foreground: #e2eee7;
+  --muted: #22372c;
+  --muted-foreground: #9bb2a3;
+  --accent: #294234;
+  --accent-foreground: #e2eee7;
+  --destructive: #fa8593;
+  --border: #31483a;
+  --input: #3b5344;
+  --ring: #81cfa3;
+  --sidebar: #12251b;
+  --sidebar-foreground: #d6e5dd;
+  --sidebar-accent: #254436;
+  --sidebar-accent-foreground: #fff;
+  --sidebar-border: #345143;
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    margin: 0;
+  }
+  button,
+  a,
+  input,
+  select {
+    touch-action: manipulation;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}

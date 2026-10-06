@@ -1,0 +1,21 @@
+name: finances-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: finances
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD}
+      POSTGRES_DB: finances
+    ports:
+      - '127.0.0.1:${DEV_DB_PORT:-54329}:5432'
+    volumes:
+      - finances_dev_db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U finances -d finances']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  finances_dev_db:

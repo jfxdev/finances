@@ -1,0 +1,42 @@
+{
+  "name": "@finances/api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=../../.env --import tsx --watch src/main.ts",
+    "build": "tsup src/main.ts src/migrate.ts src/rotate-keys.ts --format esm --out-dir dist --external argon2",
+    "start": "node dist/main.js",
+    "migrate": "node --env-file-if-exists=../../.env --import tsx src/migrate.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run tests/domain.test.ts",
+    "test:integration": "vitest run --no-file-parallelism tests/integration.test.ts tests/migrations.test.ts",
+    "generate:client": "node --import tsx src/generate-client.ts",
+    "rotate-keys": "node --import tsx src/rotate-keys.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^8.3.0",
+    "@fastify/swagger": "^9.6.1",
+    "@fastify/swagger-ui": "^5.2.5",
+    "@finances/contracts": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "argon2": "^0.44.0",
+    "drizzle-orm": "^0.45.1",
+    "fastify": "^5.12.5",
+    "fastify-type-provider-zod": "^6.1.0",
+    "pg": "^8.16.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.6",
+    "drizzle-kit": "^0.31.11",
+    "openapi-typescript": "^7.13.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "vitest": "^4.0.18"
+  }
+}

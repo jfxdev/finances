@@ -1,0 +1,24 @@
+{
+  "name": "finances",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @finances/api --filter @finances/web dev",
+    "build": "pnpm --filter @finances/contracts build && pnpm --filter @finances/api build && pnpm --filter @finances/mcp build && pnpm --filter @finances/web build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @finances/api test",
+    "test:integration": "pnpm --filter @finances/api test:integration",
+    "test:e2e": "playwright test",
+    "db:migrate": "pnpm --filter @finances/api migrate",
+    "generate:client": "pnpm --filter @finances/api generate:client",
+    "db:generate": "pnpm --filter @finances/api db:generate",
+    "db:check": "pnpm --filter @finances/api db:check"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^24.10.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3"
+  }
+}
