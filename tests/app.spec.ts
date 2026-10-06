@@ -201,6 +201,7 @@ test('money fields restrict characters and currency precision while saving exact
 test('mobile and desktop financial workflows, installation and offline privacy', async ({
   page,
   context,
+  isMobile,
 }) => {
   const email = `browser-${Date.now()}@example.test`;
   await page.goto('/');
@@ -254,7 +255,16 @@ test('mobile and desktop financial workflows, installation and offline privacy',
   await page.getByRole('button', { name: 'Salvar', exact: true }).click();
   const expenseRecurrences = page.getByRole('table', { name: 'Recorrências de despesas' });
   await expect(expenseRecurrences.getByText('ChatGPT', { exact: true })).toBeVisible();
-  await expenseRecurrences.getByRole('button', { name: 'Editar ChatGPT' }).click();
+  if (isMobile) {
+    const savedNotification = page
+      .locator('[data-sonner-toast]')
+      .filter({ hasText: 'Registro salvo' })
+      .first();
+    await expect(savedNotification).toBeVisible();
+    // Keep the notification visible while editing to catch overlapping mobile feedback.
+    await savedNotification.hover();
+  }
+  await expenseRecurrences.getByRole('button', { name: 'Editar ChatGPT' }).click({ timeout: 5000 });
   await page.getByRole('switch', { name: 'Pausada', exact: true }).check();
   await page.getByRole('button', { name: 'Salvar', exact: true }).click();
   const inactiveRecurrence = expenseRecurrences.getByRole('row').filter({ hasText: 'ChatGPT' });
