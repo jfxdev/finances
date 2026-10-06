@@ -37,7 +37,13 @@ export async function buildApp(config: Config, logging = false) {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   await app.register(cookie);
-  await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
+  // The browser suite runs several isolated user journeys from one runner IP.
+  // Keep production's brute-force protection while giving that test-only shared
+  // address enough room to exercise the complete workflows without a timeout.
+  await app.register(rateLimit, {
+    max: config.NODE_ENV === 'test' ? 3_000 : 300,
+    timeWindow: '1 minute',
+  });
   await app.register(swagger, {
     openapi: {
       info: { title: 'Finances API', version: '0.1.0' },
